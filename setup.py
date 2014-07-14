@@ -1,0 +1,21 @@
+from setuptools import setup, find_packages
+
+setup(name='addressable',
+      description='Use lists like you would dictionaries.',
+      long_description=open('README.md').read(),
+      author='Stijn Debrouwere',
+      author_email='stijn@stdout.be',
+      url='http://stdbrouw.github.com/python-addressable/',
+      download_url='http://www.github.com/stdbrouw/python-addressable/tarball/master',
+      version='1.0.0',
+      license='MIT',
+      packages=find_packages(),
+      keywords='utility',
+      classifiers=['Development Status :: 5 - Production/Stable',
+                   'Intended Audience :: Developers',
+                   'License :: OSI Approved :: MIT License',
+                   'Operating System :: OS Independent',
+                   'Programming Language :: Python',
+                   'Topic :: Utilities',
+                   ],
+      )
