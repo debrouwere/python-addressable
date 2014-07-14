@@ -79,3 +79,9 @@ class List(list):
             raise KeyError("Cannot find {key} among the available {name}".format(
                         key=key, name=self.name))
 
+    def index(self, key):
+        for index in self.indices:
+            for i, candidate in enumerate(index):
+                if self.cmp(key, candidate):
+                    return i
+        raise ValueError(key + " is not in list")
