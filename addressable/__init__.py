@@ -9,11 +9,16 @@ TODO:
 returning an item by name
 """
 
-def get(obj, name):
+def get(obj, name, lower=False):
     if isinstance(obj, dict):
-        return obj.get(name)
+        value = obj.get(name)
     else:
-        return getattr(obj, name)
+        value = getattr(obj, name)
+
+    if lower:
+        return value.lower()
+    else:
+        return value
 
 def noop(value):
     return value
@@ -23,6 +28,9 @@ def contains(a, b):
 
 def equals(a, b):
     return a == b
+
+def iequals(a, b):
+    return equals(a.lower(), b.lower())
 
 
 def map(fn, l):
@@ -35,12 +43,13 @@ def filter(fn, l):
 
 
 class List(list):
-    def __init__(self, items, indices=[], facet=noop, unique=True, fuzzy=False, name='items'):
+    def __init__(self, items, indices=[], facet=noop, unique=True, fuzzy=False, insensitive=False, name='items'):
         self.name = name
         self.indices = []
         self.indexed_on = indices
         self.unique = unique
         self.fuzzy = fuzzy
+        self.insensitive = insensitive
         self.keys = set()
 
         if isinstance(facet, basestring):
@@ -49,7 +58,7 @@ class List(list):
             self.facet = facet
 
         for name in indices:
-            index = {get(v, name): v for v in items}
+            index = {get(v, name, lower=insensitive): v for v in items}
             self.indices.append(index)
 
             if self.unique:
@@ -64,6 +73,8 @@ class List(list):
     def cmp(self):
         if self.fuzzy:
             return contains
+        elif self.insensitive:
+            return iequals
         else:
             return equals
 
@@ -71,13 +82,21 @@ class List(list):
         if isinstance(key, int):
             return super(List, self).__getitem__(key)
         else:
-            for index in self.indices:
-                for candidate in index:
-                    if self.cmp(key, candidate):
-                        found = index[candidate]
-                        return self.facet(found)
-            raise KeyError("Cannot find {key} among the available {name}".format(
-                        key=key, name=self.name))
+            value = self.get(key)
+
+            if value:
+                return value
+            else:
+                raise KeyError("Cannot find {key} among the available {name}".format(
+                            key=key, name=self.name))                
+
+    def get(self, key, default=None):
+        for index in self.indices:
+            for candidate in index:
+                if self.cmp(key, candidate):
+                    found = index[candidate]
+                    return self.facet(found)
+        return default
 
     def index(self, key):
         for index in self.indices:
