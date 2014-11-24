@@ -1,4 +1,6 @@
 import __builtin__
+from collections import OrderedDict
+from pylev import levenshtein
 
 """
 TODO: 
@@ -58,7 +60,7 @@ class List(list):
             self.facet = facet
 
         for name in indices:
-            index = {get(v, name, lower=insensitive): v for v in items}
+            index = OrderedDict([(get(v, name, lower=insensitive), v) for v in items])
             self.indices.append(index)
 
             if self.unique:
@@ -78,6 +80,15 @@ class List(list):
         else:
             return equals
 
+    def suggest(self, key, distance=3):
+        suggestions = set()
+        for index in self.indices:
+            for candidate in index:
+                if levenshtein(key, candidate) <= distance:
+                    suggestions.add(index[candidate])
+        return suggestions
+
+
     def __getitem__(self, key):
         if isinstance(key, int):
             return super(List, self).__getitem__(key)
@@ -87,8 +98,13 @@ class List(list):
             if value:
                 return value
             else:
-                raise KeyError("Cannot find {key} among the available {name}".format(
-                            key=key, name=self.name))                
+                message = "Cannot find {key} among the available {name}.".format(
+                    key=key, name=self.name)
+                suggestions = ", ".join(
+                    [unicode(suggestion) for suggestion in self.suggest(key)])
+                if len(suggestions):
+                    suggestions = " Did you mean: {}?".format(suggestions)
+                raise KeyError(message + suggestions)                
 
     def get(self, key, default=None):
         for index in self.indices:
