@@ -34,14 +34,23 @@ def equals(a, b):
 def iequals(a, b):
     return equals(a.lower(), b.lower())
 
+def apply(fn, l, applicator):
+    result = applicator(fn, l)
+    cls = l.__class__
+    return cls(
+        result, 
+        indices=l.indexed_on, 
+        facet=l.facet, 
+        unique=l.unique, 
+        fuzzy=l.fuzzy, 
+        name=l.name, 
+        )
 
 def map(fn, l):
-    result = __builtin__.map(fn, l)
-    return List(result, l.indexed_on, l.facet, l.unique, l.fuzzy, l.name)
+    return apply(fn, l, __builtin__.map)
 
 def filter(fn, l):
-    result = __builtin__.filter(fn, l)
-    return List(result, l.indexed_on, l.facet, l.unique, l.fuzzy, l.name)
+    return apply(fn, l, __builtin__.filter)
 
 
 class List(list):
