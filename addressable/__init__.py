@@ -74,6 +74,11 @@ class List(list):
         else:
             self.facet = facet
 
+        # we need to loop through the items once for every index, so 
+        # to avoid problems with iterators, let's make sure items is 
+        # a list
+        items = list(items)
+
         for name in indices:
             index = OrderedDict([(get(v, name, lower=insensitive), v) for v in items])
             self.indices.append(index)
