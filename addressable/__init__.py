@@ -4,6 +4,7 @@ from pylev import levenshtein
 # support for Python 2 and 3
 try:
     import builtins
+    basestring = unicode = str
 except ImportError:
     import __builtin__ as builtins
 
