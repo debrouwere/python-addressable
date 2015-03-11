@@ -1,6 +1,11 @@
-import __builtin__
 from collections import OrderedDict
 from pylev import levenshtein
+
+# support for Python 2 and 3
+try:
+    import builtins
+except ImportError:
+    import __builtin__ as builtins
 
 """
 TODO: 
@@ -47,10 +52,10 @@ def apply(fn, l, applicator):
         )
 
 def map(fn, l):
-    return apply(fn, l, __builtin__.map)
+    return apply(fn, l, builtins.map)
 
 def filter(fn, l):
-    return apply(fn, l, __builtin__.filter)
+    return apply(fn, l, builtins.filter)
 
 
 class List(list):
